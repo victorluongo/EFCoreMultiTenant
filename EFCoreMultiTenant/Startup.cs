@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EFCoreMultiTenant.Data;
+using EFCoreMultiTenant.Middlewares;
 using EFCoreMultiTenant.Models;
+using EFCoreMultiTenant.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,6 +31,8 @@ namespace EFCoreMultiTenant
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<TenantData>();
+            
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -60,6 +64,8 @@ namespace EFCoreMultiTenant
 
             app.UseAuthorization();
 
+            app.UseMiddleware<TenantMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -76,17 +82,17 @@ namespace EFCoreMultiTenant
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
 
-            for(var i=1; i<=5; i++)
-            {
-                _context.Customers.Add(new Customer {
-                    Name = $"Customer #{i}"
-                });
+            _context.Customers.AddRange(
+                new Customer { Name = "Microsoft", TenantId = "1"},
+                new Customer { Name = "Apple", TenantId = "2"}
+            );
 
-                _context.Items.Add(new Item {
-                    Description = $"Item #{i}",
-                    SalesPrice = Convert.ToDecimal(i)
-                });                
-            }
+            _context.Items.AddRange(
+                new Item { Description = "Office 365 Family", SalesPrice = 45m, TenantId = "1"},
+                new Item { Description = "Macbook Pro M1", SalesPrice = 19799m, TenantId = "2"},
+                new Item { Description = "iPhone 13 Pro Max 128Gb", SalesPrice = 8499m, TenantId = "2"},
+                new Item { Description = "iPad 11 Pro Wifi 128Gb", SalesPrice = 10799m, TenantId = "2"}
+            );
             
             _context.SaveChanges();
         }
