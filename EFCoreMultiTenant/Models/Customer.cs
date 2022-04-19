@@ -8,5 +8,6 @@ namespace EFCoreMultiTenant.Models
     public class Customer : BaseEntity
     {
         public string Name {get; set;}
+        public ICollection<Item> Items {get; set;}
     }
 }

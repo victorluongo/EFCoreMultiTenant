@@ -44,6 +44,11 @@ namespace EFCoreMultiTenant
                 .LogTo(Console.WriteLine)
                 .EnableSensitiveDataLogging()
             );
+
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,10 +93,10 @@ namespace EFCoreMultiTenant
             );
 
             _context.Items.AddRange(
-                new Item { Description = "Office 365 Family", SalesPrice = 45m, TenantId = "1"},
-                new Item { Description = "Macbook Pro M1", SalesPrice = 19799m, TenantId = "2"},
-                new Item { Description = "iPhone 13 Pro Max 128Gb", SalesPrice = 8499m, TenantId = "2"},
-                new Item { Description = "iPad 11 Pro Wifi 128Gb", SalesPrice = 10799m, TenantId = "2"}
+                new Item { Description = "Office 365 Family", SalesPrice = 45m, CustomerId=1, TenantId = "1"},
+                new Item { Description = "Macbook Pro M1", SalesPrice = 19799m, CustomerId=2, TenantId = "2"},
+                new Item { Description = "iPhone 13 Pro Max 128Gb", SalesPrice = 8499m, CustomerId=2, TenantId = "2"},
+                new Item { Description = "iPad 11 Pro Wifi 128Gb", SalesPrice = 10799m, CustomerId=2, TenantId = "2"}
             );
             
             _context.SaveChanges();

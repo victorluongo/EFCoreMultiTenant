@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using EFCoreMultiTenant.Data;
 using EFCoreMultiTenant.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace EFCoreMultiTenant.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("{tenantId}/[controller]")]
     public class CustomerController : ControllerBase
     {
         private readonly ILogger<CustomerController> _logger;
@@ -23,7 +24,7 @@ namespace EFCoreMultiTenant.Controllers
         [HttpGet]
         public IEnumerable<Customer>Get([FromServices]ApplicationContext _context)
         {
-            var customers = _context.Customers.ToArray();
+            var customers = _context.Customers.Include(p => p.Items).ToArray();
 
             return customers;
         }

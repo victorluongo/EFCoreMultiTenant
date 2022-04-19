@@ -81,4 +81,8 @@ https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotne
 
     dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 5.0.3
 
+**NewtonsoftJson**
+
+    dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson --version 3.0.0    
+
 

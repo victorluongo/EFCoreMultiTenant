@@ -22,5 +22,11 @@ namespace EFCoreMultiTenant.Data
         {
             _tenant = tenant;
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Customer>().HasQueryFilter(p => p.TenantId == _tenant.TenantId);
+            modelBuilder.Entity<Item>().HasQueryFilter(p => p.TenantId == _tenant.TenantId);
+        }
     }
 }
