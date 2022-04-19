@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EFCoreMultiTenant.Data;
+using EFCoreMultiTenant.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,6 +34,12 @@ namespace EFCoreMultiTenant
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "EFCoreMultiTenant", Version = "v1" });
             });
+
+            services.AddDbContext<ApplicationContext>(p=>p
+                .UseSqlite("Data source=SQLiteDatabase.sqlite")
+                .LogTo(Console.WriteLine)
+                .EnableSensitiveDataLogging()
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +52,8 @@ namespace EFCoreMultiTenant
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EFCoreMultiTenant v1"));
             }
 
+            DatabaseInitialize(app);
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -55,5 +65,31 @@ namespace EFCoreMultiTenant
                 endpoints.MapControllers();
             });
         }
+
+        private void DatabaseInitialize(IApplicationBuilder app)
+        {
+            using var _context = app.ApplicationServices
+                .CreateScope()
+                .ServiceProvider
+                .GetRequiredService<ApplicationContext>();
+
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
+            for(var i=1; i<=5; i++)
+            {
+                _context.Customers.Add(new Customer {
+                    Name = $"Customer #{i}"
+                });
+
+                _context.Items.Add(new Item {
+                    Description = $"Item #{i}",
+                    SalesPrice = Convert.ToDecimal(i)
+                });                
+            }
+            
+            _context.SaveChanges();
+        }
+
     }
 }
